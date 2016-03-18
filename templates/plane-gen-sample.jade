@@ -6,29 +6,29 @@ html(lang='en')
     h1 threejs-mesh-gen-sample
       small Sample of mesh generation using three.js
     h2 Simple Plane
-      p Generate simple plane
-      .simple-plane.result
-      .simple-plane.inputs
-        input(type='number' name='width' min='1' max='256' value='16')
-        input(type='number' name='height' min='1' max='256' value='16')
-        input(type='button' name='gen' value='Generate')
-    script(src='javascripts/three.js')
-    script(src='javascripts/simple-plane.js')
-    script(src='javascripts/canvas-init.js')
+    p Generate simple plane
+    .simple-plane.result
+    .simple-plane.inputs
+      input(type='number' name='width' min='1' max='256' value='16')
+      input(type='number' name='height' min='1' max='256' value='16')
+      input(type='checkbox' name='wireframe')
+      |Wireframe
+      input(type='button' name='gen' value='Generate')
     script.
       window.addEventListener('load',function(){
-        document.querySelector('.simple-plane.inputs input[name=gen]').addEventListener('click',function(){
+        document.querySelector('.simple-plane.inputs > input[name=gen]').addEventListener('click',function(){
           var generatedCanvas = TJSMeshSample.canvasGenerate({width:640,height:480,selector:'.simple-plane.result'})
           
-          var meshWidth = parseInt(document.querySelector('.simple-plane.inputs input[name=width]').value)
-          var meshHeight = parseInt(document.querySelector('.simple-plane.inputs input[name=height]').value)
+          var meshWidth = parseInt(document.querySelector('.simple-plane.inputs > input[name=width]').value)
+          var meshHeight = parseInt(document.querySelector('.simple-plane.inputs > input[name=height]').value)
+          var wireframe = document.querySelector('.simple-plane.inputs > input[name=wireframe]').checked === true
           
           generatedCanvas.simplePlane =  TJSMeshSample.simplePlaneGen({width:meshWidth,height:meshHeight})
           
           var jsonLoader = new THREE.JSONLoader()
           
           generatedCanvas.geometry = jsonLoader.parse(generatedCanvas.simplePlane).geometry
-          generatedCanvas.mesh = new THREE.Mesh(generatedCanvas.geometry,new THREE.MeshBasicMaterial({color:0x00ff00,wireframe:false}))
+          generatedCanvas.mesh = new THREE.Mesh(generatedCanvas.geometry,new THREE.MeshBasicMaterial({color:0x00ff00,wireframe:wireframe}))
           
           generatedCanvas.scene.add(generatedCanvas.mesh)
           
@@ -36,3 +36,41 @@ html(lang='en')
           generatedCanvas.mesh.rotation.y = 0
         })
       })
+    h2 Textured Simple Plane
+    p Generate textured simple plane
+    .textured-simple-plane.result
+    .textured-simple-plane.inputs
+      input(type='number' name='width' min='1' max='256' value='16')
+      input(type='number' name='height' min='1' max='256' value='16')
+      img(src="lenna.png")
+      input(type='button' name='gen' value='Generate')
+    script.
+      window.addEventListener('load',function(){
+        document.querySelector('.textured-simple-plane.inputs > input[name=gen]').addEventListener('click',function(){
+          var generatedCanvas = TJSMeshSample.canvasGenerate({width:640,height:480,selector:'.textured-simple-plane.result'})
+          
+          var meshWidth = parseInt(document.querySelector('.textured-simple-plane.inputs > input[name=width]').value)
+          var meshHeight = parseInt(document.querySelector('.textured-simple-plane.inputs > input[name=height]').value)
+          
+          generatedCanvas.simplePlane =  TJSMeshSample.simplePlaneGen({width:meshWidth,height:meshHeight})
+          
+          var jsonLoader = new THREE.JSONLoader()
+          
+          generatedCanvas.geometry = jsonLoader.parse(generatedCanvas.simplePlane).geometry
+          
+          var img = document.querySelector('.textured-simple-plane.inputs > img')
+          
+          var texture = new THREE.Texture(img)
+          texture.needsUpdate = true
+          
+          generatedCanvas.mesh = new THREE.Mesh(generatedCanvas.geometry,new THREE.MeshBasicMaterial({map:texture}))
+          
+          generatedCanvas.scene.add(generatedCanvas.mesh)
+          
+          generatedCanvas.mesh.position.z = -10
+          generatedCanvas.mesh.rotation.y = 0
+        })
+      })
+    script(src='javascripts/three.js')
+    script(src='javascripts/simple-plane.js')
+    script(src='javascripts/canvas-init.js')
